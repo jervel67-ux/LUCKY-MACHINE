@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K/C x Q90 CHANCE MACHINE</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      background-color: #0c101c;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px 15px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .title-header {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .subtitle-header {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #f3a832;
+      margin-bottom: 20px;
+    }
+
+    /* Dashboard Stats */
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      background-color: #151c2e;
+      border-radius: 12px;
+      padding: 12px 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      flex: 1;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: #728096;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 4px;
+    }
+
+    /* Slot Machine Frame */
+    .machine-card {
+      background-color: #151c2e;
+      border: 2px solid #b8860b;
+      border-radius: 20px;
+      padding: 20px 15px;
+    }
+
+    .slots-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .slot-box {
+      width: 75px;
+      height: 85px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: #333;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .spin-btn {
+      width: 100%;
+      background-color: #e53935;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 10px;
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(229, 57, 53, 0.4);
+    }
+
+    .spin-btn:disabled {
+      background-color: #4a5568;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .instructions {
+      font-size: 13px;
+      color: #d1d5db;
+      margin-top: 15px;
+      margin-bottom: 0;
+    }
+
+    /* Rules Card */
+    .rules-card {
+      background-color: #151c2e;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .rules-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin: 0 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+    }
+
+    .rules-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 13px;
+      color: #e2e8f0;
+      line-height: 1.8;
+    }
+
+    .rules-list li span {
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="title-header">
+    👑 K/C x Q90 🤝
+  </div>
+  <div class="subtitle-header">
+    🎰 CHANCE MACHINE
+  </div>
+
+  <!-- Stats Header -->
+  <div class="stats-container">
+    <div class="stat-item">
+      <div class="stat-label">TIME<br>REMAINING</div>
+      <div class="stat-value" id="timer">06:13:18</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label"><br>PLAYERS</div>
+      <div class="stat-value" id="playerCount">0/59</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label"><br>WINNERS</div>
+      <div class="stat-value">3</div>
+    </div>
+  </div>
+
+  <!-- Slots Card -->
+  <div class="machine-card">
+    <div class="slots-wrapper">
+      <div id="slot1" class="slot-box">7️⃣</div>
+      <div id="slot2" class="slot-box">👑</div>
+      <div id="slot3" class="slot-box">💎</div>
+    </div>
+
+    <button id="spinBtn" class="spin-btn" onclick="spin()">
+      🎰 SPIN THE MACHINE
+    </button>
+
+    <p id="statusMsg" class="instructions">Tap to spin the machine!</p>
+  </div>
+
+  <!-- Rules Card -->
+  <div class="rules-card">
+    <div class="rules-title">📜 RULES</div>
+    <ul class="rules-list">
+      <li>• Event: <span>8 hours</span>.</li>
+      <li>• Maximum: <span>59 players</span>.</li>
+      <li>• Each player must spin the machine.</li>
+      <li>• After completion: <span>3 winners</span>.</li>
+      <li>• Prize: <span>FULL CRATE</span>.</li>
+    </ul>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    let currentPlayers = parseInt(localStorage.getItem('players_count') || "0");
+    document.getElementById('playerCount').innerText = `${currentPlayers}/59`;
+
+    const symbols = ['7️⃣', '👑', '💎'];
+
+    function spin() {
+      const btn = document.getElementById('spinBtn');
+      const status = document.getElementById('statusMsg');
+
+      if (currentPlayers >= 59) {
+        status.innerText = "❌ Maximum limit of 59 players reached!";
+        btn.disabled = true;
+        return;
+      }
+
+      btn.disabled = true;
+
+      let count = 0;
+      const interval = setInterval(() => {
+        document.getElementById('slot1').innerText = symbols[Math.floor(Math.random() * symbols.length)];
+        document.getElementById('slot2').innerText = symbols[Math.floor(Math.random() * symbols.length)];
+        document.getElementById('slot3').innerText = symbols[Math.floor(Math.random() * symbols.length)];
+        count++;
+
+        if (count > 12) {
+          clearInterval(interval);
+          finishSpin();
+        }
+      }, 100);
+    }
+
+    function finishSpin() {
+      currentPlayers++;
+      localStorage.setItem('players_count', currentPlayers);
+      document.getElementById('playerCount').innerText = `${currentPlayers}/59`;
+      document.getElementById('statusMsg').innerText = "✅ Spin recorded! Good luck for the final draw.";
+    }
+  </script>
+</body>
+</html>
