@@ -225,7 +225,24 @@ const supabaseClient = window.supabase.createClient(
     document.getElementById('playerCount').innerText = `${currentPlayers}/59`;
 
     const symbols = ['7️⃣', '👑', '💎'];
+async function checkParticipation() {
+  const telegramId = tg.initDataUnsafe.user?.id?.toString();
 
+  if (!telegramId) return;
+
+  const { data } = await supabaseClient
+    .from('Players')
+    .select('telegram_id')
+    .eq('telegram_id', telegramId)
+    .maybeSingle();
+
+  if (data) {
+    document.getElementById('spinBtn').disabled = true;
+    document.getElementById('statusMsg').textContent = 'You already participated!';
+  }
+}
+
+checkParticipation();
     function spin() {
       const btn = document.getElementById('spinBtn');
       const status = document.getElementById('statusMsg');
