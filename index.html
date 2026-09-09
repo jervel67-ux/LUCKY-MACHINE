@@ -297,7 +297,22 @@ checkParticipation();
   document.getElementById('playerCount').textContent = `${count || 0}/59`;
   document.getElementById('statusMsg').textContent = 'Spin completed!';
 }
-  const endTime = Date.now() + 24 * 60 * 60 * 1000;
+  let endTime = null;
+
+async function loadEndTime() {
+  const { data, error } = await supabaseClient
+    .from('LotterySettings')
+    .select('end_time')
+    .eq('id', 1)
+    .single();
+
+  if (!error && data) {
+    endTime = new Date(data.end_time).getTime();
+    updateTimer();
+  }
+}
+
+loadEndTime();
 
 function updateTimer() {
   const remaining = endTime - Date.now();
