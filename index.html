@@ -289,7 +289,7 @@ checkParticipation();
 
   const { error } = await supabaseClient
     .from('Players')
-    ..insert({
+    .insert({
   telegram_id: telegramId,
   first_name: tg.initDataUnsafe.user?.first_name || '',
   username: tg.initDataUnsafe.user?.username || ''
