@@ -347,17 +347,35 @@ function updateTimer() {
 updateTimer();
 setInterval(updateTimer, 1000);  
    async function showWinners() {
-  const { data, error } = await supabaseClient
+  const { data: winners, error } = await supabaseClient
     .from('Winners')
     .select('telegram_id, winner_number')
     .order('winner_number');
 
-  if (error || !data || data.length === 0) return;
+  if (error || !winners || winners.length === 0) return;
+
+  const ids = winners.map(w => w.telegram_id);
+
+  const { data: players } = await supabaseClient
+    .from('Players')
+    .select('telegram_id, first_name, username')
+    .in('telegram_id', ids);
+
+  const playerMap = Object.fromEntries(
+    (players || []).map(p => [p.telegram_id, p])
+  );
 
   document.getElementById('winnersCard').style.display = 'block';
 
   document.getElementById('winnersList').innerHTML =
-    data.map(w => `<li>🏆 Winner ${w.winner_number}: <span>${w.telegram_id}</span></li>`).join('');
+    winners.map(w => {
+      const p = playerMap[w.telegram_id];
+      const name = p?.username
+        ? `@${p.username}`
+        : (p?.first_name || w.telegram_id);
+
+      return `<li>🏆 Winner ${w.winner_number}: <span>${name}</span></li>`;
+    }).join('');
 }
 
 showWinners();   
