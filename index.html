@@ -289,7 +289,11 @@ checkParticipation();
 
   const { error } = await supabaseClient
     .from('Players')
-    .insert({ telegram_id: telegramId });
+    ..insert({
+  telegram_id: telegramId,
+  first_name: tg.initDataUnsafe.user?.first_name || '',
+  username: tg.initDataUnsafe.user?.username || ''
+});
 
   if (error) {
     if (error.code === '23505') {
