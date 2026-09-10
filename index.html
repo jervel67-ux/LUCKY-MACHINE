@@ -221,8 +221,18 @@ const supabaseClient = window.supabase.createClient(
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let currentPlayers = parseInt(localStorage.getItem('players_count') || "0");
-    document.getElementById('playerCount').innerText = `${currentPlayers}/59`;
+    let currentPlayers = 0;
+
+async function loadPlayerCount() {
+  const { count } = await supabaseClient
+    .from('Players')
+    .select('*', { count: 'exact', head: true });
+
+  currentPlayers = count || 0;
+  document.getElementById('playerCount').innerText = `${currentPlayers}/59`;
+}
+
+loadPlayerCount();
 
     const symbols = ['7️⃣', '👑', '💎'];
 async function checkParticipation() {
